@@ -1,0 +1,169 @@
+---
+title: Authentication in Blenched
+description: Learn how Blenched handles user authentication with Google sign-in, including security best practices and troubleshooting common issues.
+---
+
+## Overview
+
+Blenched uses Google OAuth 2.0 for secure user authentication. You sign in with your Google account to access Blenched features like dashboards and APIs. This method ensures single sign-on (SSO) without managing separate passwords.
+
+The flow redirects you to Google's sign-in page, where you grant permissions. After approval, Google redirects back to Blenched with an authorization code. Blenched exchanges this for access and refresh tokens.
+
+<Callout kind="info">
+  Blenched stores tokens securely and handles refreshes automatically. You only need to implement the initial sign-in.
+</Callout>
+
+## Authentication Methods
+
+Blenched supports Google sign-in across web, mobile, and API clients. Choose the method that fits your application.
+
+<Tabs>
+  <Tab title="Web" icon="globe">
+    Use the Google Identity Services library for browser-based sign-in.
+    
+    <CodeGroup tabs="JavaScript">
+      ```javascript
+      import { google } from 'googleapis';
+      
+      const clientId = 'YOUR_GOOGLE_CLIENT_ID';
+      google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'email profile openid',
+        callback: (tokenResponse) => {
+          // Send token to Blenched backend
+          fetch('https://api.example.com/v1/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_token: tokenResponse.access_token })
+          });
+        }
+      }).requestAccessToken();
+      ```
+    </CodeGroup>
+  </Tab>
+  
+  <Tab title="Mobile" icon="smartphone">
+    Integrate Google Sign-In SDK for iOS/Android.
+    
+    Follow Google's mobile guides, then POST the ID token to Blenched.
+  </Tab>
+  
+  <Tab title="API" icon="api">
+    Use server-to-server OAuth for backend services.
+    
+    <ParamField header="Authorization" param-type="Bearer {access_token}" required="true">
+      Google access token obtained via OAuth flow.
+    </ParamField>
+  </Tab>
+</Tabs>
+
+## Implementation Steps
+
+Follow these steps to integrate Google sign-in with Blenched.
+
+<Steps>
+  <Step title="Create Google OAuth App" icon="settings">
+    Go to [Google Cloud Console](https://console.cloud.google.com/) and create credentials.
+    
+    Set redirect URI to `https://api.example.com/v1/auth/google/callback`.
+  </Step>
+  
+  <Step title="Configure Blenched" icon="code">
+    Add your Google Client ID in Blenched dashboard at `https://dashboard.example.com/settings/auth`.
+    
+````javascript
+// Example config
+const blenchedConfig = {
+  googleClientId: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+  redirectUri: 'https://yourapp.com/auth/callback'
+};
+````
+  </Step>
+  
+  <Step title="Handle Callback" icon="arrow-right">
+    Exchange code for tokens.
+    
+    <Request tabs="cURL">
+      ```bash
+      curl -X POST https://api.example.com/v1/auth/google/callback \
+        -H "Content-Type: application/json" \
+        -d '{"code": "AUTH_CODE_FROM_GOOGLE", "client_id": "YOUR_CLIENT_ID"}'
+      ```
+    </Request>
+  </Step>
+  
+  <Step title="Store Tokens" icon="database">
+    Blenched returns `access_token` and `refresh_token`. Store securely.
+  </Step>
+</Steps>
+
+## Token Management and Refresh
+
+Blenched access tokens expire after 1 hour. Use refresh tokens to get new ones without user interaction.
+
+<ResponseField name="access_token" field-type="string" required="true">
+  Short-lived token for API calls (expires in 3600s).
+</ResponseField>
+
+<ResponseField name="refresh_token" field-type="string">
+  Long-lived token to refresh access_token.
+</ResponseField>
+
+<CodeGroup tabs="JavaScript,Python">
+  ```javascript
+  const refreshResponse = await fetch('https://api.example.com/v1/auth/refresh', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: 'YOUR_REFRESH_TOKEN' })
+  });
+  const { access_token } = await refreshResponse.json();
+  ```
+  ```python
+  import requests
+  response = requests.post('https://api.example.com/v1/auth/refresh', 
+                          json={'refresh_token': 'YOUR_REFRESH_TOKEN'})
+  access_token = response.json()['access_token']
+  ```
+</CodeGroup>
+
+## Security Considerations
+
+Protect your Blenched integration with these practices.
+
+<Callout kind="alert">
+  Never expose refresh tokens in client-side code. Always use backend proxies for token exchange.
+</Callout>
+
+- Validate tokens server-side using Google's tokeninfo endpoint.
+- Use HTTPS everywhere.
+- Scope requests minimally: `openid email profile`.
+- Rotate client secrets regularly.
+
+<Expandable title="Advanced: Token Revocation" default-open="false">
+  Revoke tokens on logout:
+  
+````bash
+curl -X POST https://api.example.com/v1/auth/revoke \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+````
+</Expandable>
+
+## Linking Multiple Accounts
+
+Link additional Google accounts to your Blenched profile.
+
+1. Sign in to `https://dashboard.example.com/profile`.
+2. Navigate to **Account Links** > **Add Google Account**.
+3. Complete the OAuth flow for the new account.
+
+Blenched merges profiles automatically if emails match.
+
+<Columns cols={2}>
+  <Card title="Troubleshooting" icon="help-circle" href="#">
+    Common issues like "invalid client" errors.
+  </Card>
+  
+  <Card title="Next: Quickstart" icon="rocket" href="/quickstart">
+    Build your first Blenched integration.
+  </Card>
+</Columns>

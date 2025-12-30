@@ -1,0 +1,109 @@
+---
+title: Introduction to Blenched
+description: Discover what Blenched is, its key features, and how it simplifies user authentication and account management through seamless Google integration.
+---
+
+## Overview
+
+Blenched provides a streamlined authentication platform centered around Google Sign-In. You integrate it into your web or mobile applications to handle user logins securely without building complex auth flows from scratch. Access protected resources effortlessly once users authenticate via their Google accounts.
+
+The platform manages OAuth tokens, user sessions, and account linking, reducing your development time significantly. Focus on your core features while Blenched handles the security and compliance aspects of authentication.
+
+## Key Features
+
+Blenched stands out with these core capabilities:
+
+<Columns cols={3}>
+  <Card title="Seamless Google Integration" icon="log-in" href="/quickstart">
+    Connect users instantly using Google OAuth. No custom login forms needed.
+  </Card>
+  <Card title="Secure Token Management" icon="shield" href="/authentication">
+    Automatically refresh tokens and validate sessions server-side.
+  </Card>
+  <Card title="Multi-App Support" icon="users" href="/configuration">
+    Link one Google account across web, iOS, and Android apps.
+  </Card>
+</Columns>
+
+## Primary Use Cases
+
+Choose Blenched for these common scenarios:
+
+<Tabs>
+  <Tab title="Web Applications" icon="globe">
+    Embed Google Sign-In buttons in your React or Vue apps. Handle redirects and token exchange automatically.
+  </Tab>
+  <Tab title="Mobile Apps" icon="smartphone">
+    Use native Google SDKs with Blenched backend for iOS and Android. Sync user data across devices.
+  </Tab>
+  <Tab title="Internal Tools" icon="settings">
+    Secure employee dashboards and admin panels with enterprise Google Workspace logins.
+  </Tab>
+</Tabs>
+
+## Quick Start
+
+Get up and running in minutes:
+
+<Steps>
+  <Step title="Create Account" icon="user-plus">
+    Sign up at `https://dashboard.example.com` using your Google account.
+  </Step>
+  <Step title="Get API Key" icon="key">
+    Generate your key from the dashboard settings.
+  </Step>
+  <Step title="Integrate Sign-In">
+    Add the Google Sign-In script and initialize Blenched.
+
+    <CodeGroup tabs="JavaScript,Python">
+      ```javascript
+      // Load Google API
+      gapi.load('auth2', () => {
+        gapi.auth2.init({
+          client_id: 'YOUR_GOOGLE_CLIENT_ID',
+          hosted_domain: 'example.com'
+        }).then(() => {
+          // Sign in with Blenched
+          gapi.auth2.getAuthInstance().signIn({
+            scope: 'profile email'
+          }).then(googleUser => {
+            fetch('https://api.example.com/auth/google', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                id_token: googleUser.getAuthResponse().id_token
+              })
+            });
+          });
+        });
+      });
+      ```
+      ```python
+      import requests
+
+      # Exchange Google token with Blenched
+      response = requests.post(
+          'https://api.example.com/auth/google',
+          json={'id_token': 'google-id-token-here'},
+          headers={'Authorization': 'Bearer YOUR_API_KEY'}
+      )
+      print(response.json())
+      ```
+    </CodeGroup>
+  </Step>
+</Steps>
+
+## Next Steps
+
+<Callout kind="tip">
+  Ready to dive deeper? Start with the <a href="/quickstart">Quickstart Guide</a> for full setup instructions, or explore <a href="/authentication">Authentication</a> for advanced options.
+</Callout>
+
+<Columns cols={2}>
+  <Card title="Quickstart" icon="zap" href="/quickstart">
+    Complete your first integration.
+  </Card>
+  <Card title="API Reference" icon="code" href="/authentication">
+    Detailed endpoint documentation.
+  </Card>
+</Columns>

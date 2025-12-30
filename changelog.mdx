@@ -1,0 +1,112 @@
+---
+title: Changelog
+description: Track the latest updates, improvements, and fixes in Blenched to stay informed about new features and changes.
+---
+
+## Recent Updates
+
+Stay current with Blenched releases. You receive automatic updates for the web dashboard. For SDK integrations, check the [release notes](https://github.com/blenched/releases) and update your dependencies.
+
+<Update label="2024-10-15" description="v1.2.0" tags={["feature", "improvement"]}>
+
+## New Features
+
+- Added support for multi-factor authentication (MFA) during Google sign-in flows
+- Introduced webhook notifications for login events
+
+## Improvements
+
+- Reduced login latency by `>30%` through optimized token validation
+- Enhanced dashboard UI with dark mode toggle
+
+## Bug Fixes
+
+- Fixed intermittent session expiration issues
+- Resolved error handling for invalid Google OAuth tokens
+
+To integrate the new webhook feature:
+
+````javascript
+const webhookHandler = (event) => {
+  if (event.type === 'login') {
+    console.log(`User ${event.userId} logged in`);
+  }
+};
+````
+
+</Update>
+
+<Update label="2024-09-20" description="v1.1.0" tags={["feature", "bugfix"]}>
+
+## New Features
+
+- Added account management API endpoints for user profile updates
+- Support for custom redirect URIs in authentication flows
+
+## Bug Fixes
+
+- Patched security vulnerability in token refresh logic (CVE-2024-XXXX)
+- Fixed dashboard crash on large session lists
+
+Example API usage for profile updates:
+
+````bash
+curl -X POST https://api.example.com/v1/users/{userId}/profile \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"email": "new@example.com"}'
+````
+
+</Update>
+
+<Update label="2024-08-10" description="v1.0.0" tags={["feature", "breaking"]}>
+
+## New Features
+
+- Initial release with Google OAuth 2.0 integration
+- Real-time session dashboard at `https://dashboard.example.com/sessions`
+- Basic SDK for JavaScript and Python
+
+## Breaking Changes
+
+- Updated token format from JWT v1 to v2 – migrate your parsers
+
+Initial SDK installation:
+
+````javascript
+npm install blenched-sdk@1.0.0
+````
+
+````python
+pip install blenched-sdk==1.0.0
+````
+
+</Update>
+
+## Quick Navigation
+
+<Columns cols={3}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get started with Blenched authentication in minutes.
+  </Card>
+  <Card title="Authentication" icon="shield" href="/authentication">
+    Detailed guides on OAuth flows and tokens.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Full endpoint documentation and examples.
+  </Card>
+</Columns>
+
+## Upcoming Features
+
+<ExpandableGroup>
+  <Expandable title="Passwordless Login (ETA Q4 2024)" default-open="true">
+    Preview: Magic link support via email or SMS. You configure providers in the dashboard under Security > Auth Methods.
+  </Expandable>
+  <Expandable title="Enterprise SSO Integrations">
+    SAML and Okta support for teams. Test in beta at `https://dashboard.example.com/beta/sso`.
+  </Expandable>
+</ExpandableGroup>
+
+<Callout kind="tip">
+  Subscribe to updates via the dashboard notifications bell or our RSS feed at `/changelog/feed.xml`. Check GitHub for beta releases.
+</Callout>
